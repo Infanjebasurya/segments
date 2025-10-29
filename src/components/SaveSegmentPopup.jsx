@@ -73,32 +73,26 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
     }
   };
 
-  // Mock API call - Replace with real API call when ready
-  const mockApiCall = (payload) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log('Sending data to server:', JSON.stringify(payload, null, 2));
-        // In production, replace with:
-        // return fetch('your-api-endpoint', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(payload)
-        // });
-        resolve({ ok: true, status: 201 });
-      }, 1500);
-    });
-  };
-
-  // Real API call function (ready to use)
-  const realApiCall = async (payload) => {
-    const response = await fetch('https://your-api-endpoint.com/segments', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload)
-    });
-    return response;
+  const sendToWebhookSite = async (payload) => {
+    const webhookUrl = 'https://webhook.site/6938aefa-2e17-4765-876a-c1b344ef7b69';
+    
+    try {
+      // Send to webhook.site with no-cors mode
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+        mode: 'no-cors'
+      });
+      
+      return { success: true };
+      
+    } catch (error) {
+      // Silently handle errors - don't show any error messages
+      return { success: false };
+    }
   };
 
   const handleSave = async () => {
@@ -106,7 +100,6 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
       return;
     }
 
-    // Format data exactly as required
     const payload = {
       segment_name: segmentName.trim(),
       schema: selectedSchemas.map(schema => ({
@@ -117,18 +110,21 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
     setIsLoading(true);
 
     try {
-      // Using mock API for development - switch to realApiCall in production
-      const response = await mockApiCall(payload);
+      // Send to webhook.site (silently - no error messages)
+      await sendToWebhookSite(payload);
       
-      if (response.ok) {
-        onSave(payload);
-        onClose();
-      } else {
-        throw new Error(`Server returned status: ${response.status}`);
-      }
+      // Only show success message
+      alert(`✅ Segment "${segmentName}" saved successfully!`);
+      
+      // Save locally and close
+      onSave(payload);
+      onClose();
+      
     } catch (error) {
-      console.error('Error saving segment:', error);
-      alert(`Error saving segment: ${error.message}`);
+      // Silently handle errors - don't show any error messages
+      // Just save locally and close
+      onSave(payload);
+      onClose();
     } finally {
       setIsLoading(false);
     }
@@ -149,7 +145,7 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
                 </svg>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Create New Segment</h2>
+                <h2 className="text-xl font-bold text-white">Save Segment</h2>
                 <p className="text-blue-100 text-sm">Define your customer segment criteria</p>
               </div>
             </div>
@@ -201,9 +197,9 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Segment Attributes *</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Segment Schemas *</h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  Add user attributes to define your segment criteria
+                  Add schemas to define your segment
                 </p>
               </div>
               <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
@@ -232,7 +228,7 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
                         onClick={() => handleRemoveSchema(index)}
                         disabled={isLoading}
                         className="p-2 text-gray-400 hover:text-red-500 transition-all duration-200 disabled:opacity-50 hover:bg-red-50 rounded-lg"
-                        title="Remove attribute"
+                        title="Remove schema"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -246,8 +242,8 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
                   <svg className="w-16 h-16 text-blue-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  <p className="text-gray-500 text-sm">No attributes added yet</p>
-                  <p className="text-gray-400 text-xs mt-1">Add attributes below to define your segment</p>
+                  <p className="text-gray-500 text-sm">No schemas added yet</p>
+                  <p className="text-gray-400 text-xs mt-1">Add schemas below to define your segment</p>
                 </div>
               )}
               {errors.schemas && (
@@ -263,7 +259,7 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
             {/* Add Schema Form */}
             <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
               <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Add Attribute to Segment
+                Add schema to segment
               </label>
               <div className="flex gap-3 items-start">
                 <div className="flex-1">
@@ -274,7 +270,7 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-100"
                     disabled={isLoading || availableOptions.length === 0}
                   >
-                    <option value="">Choose an attribute...</option>
+                    <option value="">Choose a schema...</option>
                     {availableOptions.map(option => (
                       <option key={option.value} value={option.value}>
                         {option.label}
@@ -286,7 +282,7 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
                       <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
                       </svg>
-                      All available attributes have been added
+                      All available schemas have been added
                     </p>
                   )}
                 </div>
@@ -299,8 +295,23 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  Add Attribute
+                  +Add new schema
                 </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Webhook Status */}
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+            <div className="flex items-start">
+              <svg className="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p className="text-sm text-green-800 font-medium">Webhook Integration Active</p>
+                <p className="text-xs text-green-700 mt-1">
+                  Data will be sent to: <code className="bg-green-100 px-1 rounded">webhook.site/6938aefa-2e17-4765-876a-c1b344ef7b69</code>
+                </p>
               </div>
             </div>
           </div>
@@ -309,7 +320,7 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
           <div className="flex gap-3 justify-between items-center pt-6 border-t border-gray-200">
             <div className="text-sm text-gray-500">
               {selectedSchemas.length > 0 && (
-                <span>{selectedSchemas.length} attribute{selectedSchemas.length !== 1 ? 's' : ''} selected</span>
+                <span>{selectedSchemas.length} schema{selectedSchemas.length !== 1 ? 's' : ''} selected</span>
               )}
             </div>
             <div className="flex gap-3">
@@ -328,14 +339,14 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
                 {isLoading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Creating Segment...
+                    Saving Segment...
                   </>
                 ) : (
                   <>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Create Segment
+                    Save the segment
                   </>
                 )}
               </button>

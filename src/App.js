@@ -9,7 +9,7 @@ function App() {
   const handleSaveSegment = async (segmentData) => {
     setIsLoading(true);
     
-    // Simulate API call delay
+   
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     console.log('Segment saved:', segmentData);
@@ -73,9 +73,9 @@ function App() {
         </div>
       </header>
 
-      {/* Main Content */}
+     
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
+        
         <div className="mb-12">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -87,7 +87,7 @@ function App() {
           </div>
         </div>
 
-        {/* Stats & Quick Actions */}
+       
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
             <div className="flex items-center space-x-4">
@@ -132,7 +132,6 @@ function App() {
           </div>
         </div>
 
-        {/* Saved Segments Section */}
         {savedSegments.length > 0 ? (
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
             <div className="flex items-center justify-between mb-8">
