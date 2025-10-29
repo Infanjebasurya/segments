@@ -302,7 +302,7 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
           </div>
 
           {/* Webhook Status */}
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+          {/* <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
             <div className="flex items-start">
               <svg className="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -314,7 +314,7 @@ const SaveSegmentPopup = ({ onClose, onSave }) => {
                 </p>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Action Buttons */}
           <div className="flex gap-3 justify-between items-center pt-6 border-t border-gray-200">
